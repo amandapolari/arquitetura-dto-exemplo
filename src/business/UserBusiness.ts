@@ -1,43 +1,17 @@
 import { UserDatabase } from '../database/UserDatabase';
+import {
+    CreateUserInputDTO,
+    CreateUserOutputDTO,
+} from '../dtos/users/createUserDto';
 import { BadRequestError } from '../errors/BadRequestError';
 import { NotFoundError } from '../errors/NotFoundError';
 import { User, UserDB } from '../models/User';
 
 export class UserBusiness {
-    public createUser = async (input: any) => {
+    public createUser = async (
+        input: CreateUserInputDTO
+    ): Promise<CreateUserOutputDTO> => {
         const { id, name, email, password } = input;
-
-        if (typeof id !== 'string') {
-            throw new BadRequestError("'id' deve ser string");
-        }
-
-        if (typeof name !== 'string') {
-            throw new BadRequestError("'name' deve ser string");
-        }
-
-        if (typeof email !== 'string') {
-            throw new BadRequestError("'email' deve ser string");
-        }
-
-        if (typeof password !== 'string') {
-            throw new BadRequestError("'password' deve ser string");
-        }
-
-        if (name.length < 2) {
-            throw new BadRequestError(
-                "'name' deve possuir pelo menos 2 caracteres"
-            );
-        }
-
-        if (!email.includes('@')) {
-            throw new BadRequestError("'email' inválido");
-        }
-
-        if (password.length < 4) {
-            throw new BadRequestError(
-                "'password' deve possuir pelo menos 4 caracteres"
-            );
-        }
 
         const userDatabase = new UserDatabase();
         const userDBExists = await userDatabase.findUserById(id);
@@ -64,13 +38,13 @@ export class UserBusiness {
 
         await userDatabase.insertUser(newUserDB);
 
-        const output = {
+        const output: CreateUserOutputDTO = {
             message: 'Cadastro realizado com sucesso',
             user: {
                 id: newUser.getId(),
                 name: newUser.getName(),
                 email: newUser.getEmail(),
-                created_at: newUser.getCreatedAt(),
+                createdAt: newUser.getCreatedAt(),
             },
         };
 
