@@ -5,6 +5,11 @@ import { CreateUserSchema } from '../dtos/users/createUserDto';
 import { ZodError } from 'zod';
 
 export class UserController {
+    constructor(
+        // injeção de dependências aqui <<<
+        private userBusiness: UserBusiness
+    ) {}
+
     public createUser = async (req: Request, res: Response) => {
         try {
             const input = CreateUserSchema.parse({
@@ -14,8 +19,12 @@ export class UserController {
                 password: req.body.password,
             });
 
-            const userBusiness = new UserBusiness();
-            const output = await userBusiness.createUser(input);
+            // após a injeção de dependências, não precisamos mais instanciar a classe:
+            // const userBusiness = new UserBusiness();
+            // const output = await userBusiness.createUser(input);
+
+            // agora podemos usar a classe injetada com this:
+            const output = await this.userBusiness.createUser(input);
 
             res.status(201).send(output);
         } catch (error) {
@@ -39,8 +48,10 @@ export class UserController {
                 q: req.query.q as string | undefined,
             };
 
-            const userBusiness = new UserBusiness();
-            const output = await userBusiness.getUsers(input);
+            // const userBusiness = new UserBusiness();
+            // const output = await userBusiness.getUsers(input);
+
+            const output = await this.userBusiness.getUsers(input);
 
             res.status(200).send(output);
         } catch (error) {
@@ -64,8 +75,10 @@ export class UserController {
                 password: req.body.password,
             };
 
-            const userBusiness = new UserBusiness();
-            const output = await userBusiness.editUser(input);
+            // const userBusiness = new UserBusiness();
+            // const output = await userBusiness.editUser(input);
+
+            const output = await this.userBusiness.editUser(input);
 
             res.status(200).send(output);
         } catch (error) {
@@ -85,8 +98,10 @@ export class UserController {
                 idToDelete: req.params.id,
             };
 
-            const userBusiness = new UserBusiness();
-            const output = await userBusiness.deleteUser(input);
+            // const userBusiness = new UserBusiness();
+            // const output = await userBusiness.deleteUser(input);
+
+            const output = await this.userBusiness.deleteUser(input);
 
             res.status(200).send(output);
         } catch (error) {
